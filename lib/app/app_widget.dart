@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:tjms_template/app/modules/home/pages/home_page.dart';
 
 import 'core/routes.dart';
+import 'modules/home/pages/home_page.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -35,6 +35,15 @@ class AppWidget extends StatelessWidget {
         });
       },
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        // Define the default brightness and colors.
+        //  brightness: Brightness.dark,
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: Colors.indigo, //<-- SEE HERE
+              displayColor: Colors.indigo, //<-- SEE HERE
+            ),
+      ),
     );
   }
 }
