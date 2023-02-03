@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_template/app/core/controller/theme_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
+import '../../../main.dart';
 import '../style.dart';
 import 'dc_menu_item.dart';
 
-class DCScaffold extends StatelessWidget {
+class DCScaffold extends StatefulWidget {
   final Widget title;
   final Widget body;
   final List<DCMenuItem> navBarItens;
@@ -22,21 +24,20 @@ class DCScaffold extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<DCScaffold> createState() => _DCScaffoldState();
+}
+
+class _DCScaffoldState extends State<DCScaffold> {
+  @override
   Widget build(BuildContext context) {
     bool enableDrawer = ResponsiveWrapper.of(context).isMobile;
 
     return Scaffold(
       appBar: AppBar(
-        title: title,
+        title: widget.title,
         leading: const FlutterLogo(),
-        actions: enableDrawer
-            ? []
-            : navBarItens.map((m) {
-                return Column(
-                  children: [_makeNavBarItem(context, m)],
-                );
-              }).toList(),
         automaticallyImplyLeading: enableDrawer,
+        actions: enableDrawer ? [] : _createMapNavBarItens(context),
       ),
       endDrawer: Visibility(
         visible: enableDrawer,
@@ -45,17 +46,17 @@ class DCScaffold extends StatelessWidget {
             shrinkWrap: true,
             padding: EdgeInsets.zero,
             children: [
-              // const UserAccountsDrawerHeader(
-              //   accountEmail: Text("user@mail.com"),
-              //   accountName: Text("User Name"),
-              //   currentAccountPicture: CircleAvatar(
-              //     child: Text("IC"),
-              //   ),
-              // ),
+              const UserAccountsDrawerHeader(
+                accountEmail: Text("user@mail.com"),
+                accountName: Text("User Name"),
+                currentAccountPicture: CircleAvatar(
+                  child: Text("IC"),
+                ),
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: drawerItens.map((m) {
+                children: widget.drawerItens.map((m) {
                   return _makeDrawItem(context, m);
                 }).toList(),
               ),
@@ -72,7 +73,7 @@ class DCScaffold extends StatelessWidget {
               Expanded(
                 child: MenuBar(
                   children: <Widget>[
-                    ...menuItens.map((m) => _makeMenuItem(context, m))
+                    ...widget.menuItens.map((m) => _makeMenuItem(context, m))
                   ],
                 ),
               ),
@@ -81,6 +82,29 @@ class DCScaffold extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Column> _createMapNavBarItens(BuildContext context) {
+    List<Column> navs = widget.navBarItens.map((m) {
+      return Column(
+        children: [_makeNavBarItem(context, m)],
+      );
+    }).toList();
+
+    navs.add(Column(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              locator<ThemeController>().changeTheme();
+            });
+          },
+          child: const Text('Theme'),
+        ),
+      ],
+    ));
+
+    return navs;
   }
 
   Widget _makeMenuItem(BuildContext context, DCMenuItem m) {
@@ -107,7 +131,7 @@ class DCScaffold extends StatelessWidget {
         onPressed: m.onPressed,
         style: TextButton.styleFrom(
           backgroundColor: Colors.transparent,
-          foregroundColor: const Color.fromARGB(255, 34, 11, 11),
+          foregroundColor: Theme.of(context).colorScheme.inversePrimary,
           textStyle: GoogleFonts.montserrat(
             textStyle: const TextStyle(
               fontSize: 14,

@@ -1,21 +1,40 @@
 import 'package:flutter/material.dart';
 
 ThemeData themeData(bool isDarkTheme) {
-  var primaryColor = Colors.indigo[30];
-  var secondaryColor = Colors.indigo[30];
+  //ligth
+  var primaryColorLight = Color.fromARGB(255, 224, 226, 227);
+  var secondaryColorLight = Colors.blueGrey;
+  var tertiaryColorLight = Colors.black;
+  var inversePrimaryColorLight = Colors.black;
+
+  //dark
+
+  var primaryColorDark = const Color.fromARGB(255, 18, 34, 59);
+  var secondaryColorDark = const Color.fromARGB(255, 153, 71, 194);
+  var tertiaryColorDark = Colors.white;
+  var inversePrimaryColorDark = Colors.white;
 
   return ThemeData(
     useMaterial3: true,
-    scaffoldBackgroundColor:
-        isDarkTheme ? Color(0xFF00001a) : Color(0xFFFFFFFF),
-    primaryColor: Colors.green,
+    scaffoldBackgroundColor: isDarkTheme ? Colors.black : Colors.white,
     colorScheme: ThemeData().colorScheme.copyWith(
-          primary: isDarkTheme ? Color.fromARGB(255, 27, 31, 53) : primaryColor,
-          secondary:
-              isDarkTheme ? const Color(0xFF1A1F3C) : const Color(0xFFFFFFFF),
+          primary: isDarkTheme ? primaryColorDark : primaryColorLight,
+          inversePrimary:
+              isDarkTheme ? inversePrimaryColorDark : inversePrimaryColorLight,
+          secondary: isDarkTheme ? secondaryColorDark : secondaryColorLight,
+          tertiary: isDarkTheme ? tertiaryColorDark : tertiaryColorLight,
           brightness: isDarkTheme ? Brightness.dark : Brightness.light,
+          background: isDarkTheme ? Colors.black : Colors.white,
         ),
-    cardColor: isDarkTheme ? const Color(0xFF0a0d2c) : primaryColor,
+    cardColor: isDarkTheme ? primaryColorDark : primaryColorLight,
     canvasColor: isDarkTheme ? Colors.black : Colors.white,
+    appBarTheme: AppBarTheme(
+        foregroundColor:
+            isDarkTheme ? inversePrimaryColorDark : inversePrimaryColorLight,
+        iconTheme: IconThemeData(
+            color: isDarkTheme
+                ? inversePrimaryColorDark
+                : inversePrimaryColorLight),
+        color: isDarkTheme ? primaryColorDark : primaryColorLight),
   );
 }
