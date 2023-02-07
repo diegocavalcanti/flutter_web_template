@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web_template/app/core/controller/theme_controller.dart';
+import 'package:flutter_web_template/app/core/theme/theme_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../../main.dart';
-import '../style.dart';
 import 'dc_menu_item.dart';
 
 class DCScaffold extends StatefulWidget {
@@ -13,6 +12,7 @@ class DCScaffold extends StatefulWidget {
   final List<DCMenuItem> navBarItens;
   final List<DCMenuItem> drawerItens;
   final List<DCMenuItem> menuItens;
+  final Widget? floatingActionButton;
 
   const DCScaffold({
     Key? key,
@@ -21,6 +21,7 @@ class DCScaffold extends StatefulWidget {
     this.drawerItens = const [],
     this.menuItens = const [],
     this.body = const SizedBox.shrink(),
+    this.floatingActionButton,
   }) : super(key: key);
 
   @override
@@ -33,55 +34,77 @@ class _DCScaffoldState extends State<DCScaffold> {
     bool enableDrawer = ResponsiveWrapper.of(context).isMobile;
 
     return Scaffold(
-      appBar: AppBar(
-        title: widget.title,
-        leading: const FlutterLogo(),
-        automaticallyImplyLeading: enableDrawer,
-        actions: enableDrawer ? [] : _createMapNavBarItens(context),
-      ),
-      endDrawer: Visibility(
-        visible: enableDrawer,
-        child: Drawer(
-          child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            children: [
-              const UserAccountsDrawerHeader(
-                accountEmail: Text("user@mail.com"),
-                accountName: Text("User Name"),
-                currentAccountPicture: CircleAvatar(
-                  child: Text("IC"),
+        appBar: AppBar(
+          title: widget.title,
+          leading: Container(
+            width: 10,
+            height: 10,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/logo.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          automaticallyImplyLeading: enableDrawer,
+          actions: enableDrawer ? [] : _createMapNavBarItens(context),
+        ),
+        floatingActionButton:
+            widget.floatingActionButton ?? widget.floatingActionButton,
+        endDrawer: Visibility(
+          visible: enableDrawer,
+          child: Drawer(
+            child: ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: widget.drawerItens.map((m) {
+                    return _makeDrawItem(context, m);
+                  }).toList(),
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: widget.drawerItens.map((m) {
-                  return _makeDrawItem(context, m);
-                }).toList(),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              //Menu Top
-              Expanded(
-                child: MenuBar(
-                  children: <Widget>[
-                    ...widget.menuItens.map((m) => _makeMenuItem(context, m))
-                  ],
-                ),
-              ),
-            ],
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (_, constraints) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  widget.menuItens.isNotEmpty
+                      ? SizedBox(
+                          width: constraints.maxWidth,
+                          height: 40,
+                          child: MenuBar(
+                            children: <Widget>[
+                              ...widget.menuItens
+                                  .map((m) => _makeMenuItem(context, m)),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    height: widget.menuItens.isNotEmpty
+                        ? (constraints.maxHeight - 40)
+                        : constraints.maxHeight,
+                    child: widget.body,
+                  )
+                ],
+              );
+            },
           ),
-        ],
-      ),
-    );
+        )
+        //        ),
+//          widget.body
+        //],
+        //)
+        );
   }
 
   List<Column> _createMapNavBarItens(BuildContext context) {
@@ -93,13 +116,18 @@ class _DCScaffoldState extends State<DCScaffold> {
 
     navs.add(Column(
       children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              locator<ThemeController>().changeTheme();
-            });
-          },
-          child: const Text('Theme'),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () {
+              setState(() {
+                injector<ThemeController>().changeTheme();
+              });
+            },
+            icon: injector<ThemeController>().isLight.value
+                ? const Icon(Icons.dark_mode)
+                : const Icon(Icons.light_mode),
+          ),
         ),
       ],
     ));
@@ -135,7 +163,6 @@ class _DCScaffoldState extends State<DCScaffold> {
           textStyle: GoogleFonts.montserrat(
             textStyle: const TextStyle(
               fontSize: 14,
-              color: textPrimary,
               letterSpacing: 1,
             ),
           ),

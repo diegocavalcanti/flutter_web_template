@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_template/app/modules/user/controller/user_controller.dart';
+import 'package:flutter_web_template/app/modules/user/models/user_model.dart';
 import 'package:get_it/get_it.dart';
 
 import 'app/app_widget.dart';
-import 'app/core/controller/theme_controller.dart';
+import 'app/core/theme/theme_controller.dart';
 
-GetIt locator = GetIt.instance;
+GetIt injector = GetIt.instance;
 
 void main() {
   //prod
-
-  locator.registerSingleton<ThemeController>(ThemeController());
+  injector.registerSingleton<ThemeController>(ThemeController());
+  injector.registerSingleton<UserController>(
+      UserController(model: UserModel(email: "", name: "")));
 
   runApp(const AppWidget());
 //   runApp(DevicePreview(
